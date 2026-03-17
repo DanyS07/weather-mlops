@@ -5,8 +5,8 @@ stages:
     deps:
     - path: data/raw
       hash: md5
-      md5: 35687209091e123922b13b9da80c119f.dir
-      size: 298150
+      md5: dd7844da187640c3fcb4bd80b071cc09.dir
+      size: 324214
       nfiles: 2
     - path: params.yaml
       hash: md5
@@ -46,14 +46,31 @@ stages:
     outs:
     - path: metrics.json
       hash: md5
-      md5: 843f097077913767710f17bfaa0336dd
-      size: 181
+      md5: 25e682011b3cc13e13641f07a348a29f
+      size: 180
     - path: models/trained
       hash: md5
-      md5: d2250505a3a95dceca1f5df23bf212b4.dir
+      md5: f31d10987bfea6d4dd90f6f31d3d7da9.dir
       size: 526418
       nfiles: 2
     - path: version.json
       hash: md5
-      md5: df99bd43cc328ba038ef22be91bd029d
-      size: 246
+      md5: 8f53fb774e35c355bcf882eb95e945c3
+      size: 245
+  collect:
+    cmd: python src/collect.py
+    deps:
+    - path: params.yaml
+      hash: md5
+      md5: e9933496b4ec9f9883b565b750048e5f
+      size: 101
+    - path: src/collect.py
+      hash: md5
+      md5: 2e56c1a9c7d81f476305144f3608c5ea
+      size: 3958
+    outs:
+    - path: data/raw
+      hash: md5
+      md5: dd7844da187640c3fcb4bd80b071cc09.dir
+      size: 324214
+      nfiles: 2

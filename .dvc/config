@@ -1,5 +1,6 @@
 [core]
     remote = localremote
+    autostage = true
 ['remote "myremote"']
     url = gdrive://<folder-id>
 ['remote "localremote"']
