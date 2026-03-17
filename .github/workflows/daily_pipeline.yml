@@ -1,5 +1,8 @@
 name: Daily MLOps Pipeline
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
@@ -16,7 +19,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          persist-credentials: true
 
       - name: Set up Python
         uses: actions/setup-python@v4
