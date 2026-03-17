@@ -1,0 +1,59 @@
+schema: '2.0'
+stages:
+  preprocess:
+    cmd: python src/preprocess.py
+    deps:
+    - path: data/raw
+      hash: md5
+      md5: 35687209091e123922b13b9da80c119f.dir
+      size: 298150
+      nfiles: 2
+    - path: params.yaml
+      hash: md5
+      md5: e9933496b4ec9f9883b565b750048e5f
+      size: 101
+    - path: src/preprocess.py
+      hash: md5
+      md5: d1b8899ab77fddc44d97357c49633c5c
+      size: 2083
+    outs:
+    - path: data/processed
+      hash: md5
+      md5: 0106bd3ad003f0c8c27292b930dc020e.dir
+      size: 21326848
+      nfiles: 8
+    - path: models/scalers
+      hash: md5
+      md5: ed61685fe8244d25c82324f9948f2d26.dir
+      size: 1802
+      nfiles: 2
+  train:
+    cmd: python src/train.py
+    deps:
+    - path: data/processed
+      hash: md5
+      md5: 0106bd3ad003f0c8c27292b930dc020e.dir
+      size: 21326848
+      nfiles: 8
+    - path: params.yaml
+      hash: md5
+      md5: e9933496b4ec9f9883b565b750048e5f
+      size: 101
+    - path: src/train.py
+      hash: md5
+      md5: bbdc45cd12ac4160038e10afe5ca2b97
+      size: 2311
+    outs:
+    - path: metrics.json
+      hash: md5
+      md5: 843f097077913767710f17bfaa0336dd
+      size: 181
+    - path: models/trained
+      hash: md5
+      md5: d2250505a3a95dceca1f5df23bf212b4.dir
+      size: 526418
+      nfiles: 2
+    - path: version.json
+      hash: md5
+      md5: df99bd43cc328ba038ef22be91bd029d
+      size: 246

@@ -30,25 +30,82 @@ def fetch_data(lat, lon, start_date, end_date):
     response = requests.get(BASE_URL, params=params)
     data = response.json()
 
+    if "hourly" not in data:
+        raise ValueError("API response missing 'hourly' data")
+
     df = pd.DataFrame(data["hourly"])
     return df
 
 
-def main():
+def update_or_create(region, coords):
+    file_path = f"data/raw/{region}.csv"
+
+    # -------------------------
+    # CASE 1: File exists → incremental update
+    # -------------------------
+    if os.path.exists(file_path):
+        existing = pd.read_csv(file_path)
+
+        existing["time"] = pd.to_datetime(existing["time"])
+        last_date = existing["time"].max().date()
+
+        today = datetime.today().date()
+
+        # If already up to date
+        if last_date >= today:
+            print(f"{region}: already up to date")
+            return
+
+        start_date = last_date + timedelta(days=1)
+        end_date = today
+
+        print(f"{region}: fetching {start_date} → {end_date}")
+
+        new_data = fetch_data(
+            coords["lat"],
+            coords["lon"],
+            start_date.strftime("%Y-%m-%d"),
+            end_date.strftime("%Y-%m-%d")
+        )
+
+        new_data["time"] = pd.to_datetime(new_data["time"])
+
+        # Append and remove duplicates
+        df = pd.concat([existing, new_data])
+        df = df.drop_duplicates(subset=["time"]).sort_values("time")
+
+    # -------------------------
+    # CASE 2: First run → full 6 months
+    # -------------------------
+    else:
+        print(f"{region}: first run (6 months data)")
+
+        end_date = datetime.today()
+        start_date = end_date - timedelta(days=180)
+
+        df = fetch_data(
+            coords["lat"],
+            coords["lon"],
+            start_date.strftime("%Y-%m-%d"),
+            end_date.strftime("%Y-%m-%d")
+        )
+
+        df["time"] = pd.to_datetime(df["time"])
+        df = df.sort_values("time")
+
+    # Save
     os.makedirs("data/raw", exist_ok=True)
+    df.to_csv(file_path, index=False)
 
-    end_date = datetime.today()
-    start_date = end_date - timedelta(days=180)
+    print(f"{region}: saved → {file_path}")
 
-    start_str = start_date.strftime("%Y-%m-%d")
-    end_str = end_date.strftime("%Y-%m-%d")
 
-    for name, coords in LOCATIONS.items():
-        df = fetch_data(coords["lat"], coords["lon"], start_str, end_str)
-
-        file_path = f"data/raw/{name}.csv"
-        df.to_csv(file_path, index=False)
-        print(f"Saved: {file_path}")
+def main():
+    for region, coords in LOCATIONS.items():
+        try:
+            update_or_create(region, coords)
+        except Exception as e:
+            print(f"Error in {region}: {e}")
 
 
 if __name__ == "__main__":
