@@ -7,7 +7,7 @@ import pickle
 
 RAW_PATH = "data/raw"
 PROCESSED_PATH = "data/processed"
-MODEL_PATH = "models"
+MODEL_PATH = "models/scalers"
 
 os.makedirs(PROCESSED_PATH, exist_ok=True)
 os.makedirs(MODEL_PATH, exist_ok=True)
