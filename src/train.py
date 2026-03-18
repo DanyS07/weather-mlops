@@ -2,7 +2,10 @@ import pandas as pd
 import pickle
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import MinMaxScaler
+import os
 
+os.makedirs("models/trained", exist_ok=True)
+os.makedirs("models/scalers", exist_ok=True)
 def train(region):
     # Load data
     df = pd.read_csv(f"data/raw/{region}.csv")
