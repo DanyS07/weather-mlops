@@ -3,74 +3,45 @@ stages:
   preprocess:
     cmd: python src/preprocess.py
     deps:
-    - path: data/raw
+    - path: data/raw/
       hash: md5
-      md5: 6c83daf836062ce4219f6265e88df486.dir
-      size: 315486
+      md5: 101c852837f6fc2b9c9b4496fa3c9cb1.dir
+      size: 324176
       nfiles: 2
-    - path: params.yaml
-      hash: md5
-      md5: c9a20ea31decda21cffe6f424f4c29af
-      size: 93
     - path: src/preprocess.py
       hash: md5
-      md5: bc51af4bb1c45ecf01fd9e0b302f04cb
-      size: 2011
+      md5: 236400922a804b10850c7c6ce9b8befa
+      size: 568
     outs:
-    - path: data/processed
+    - path: data/processed/data.csv
       hash: md5
-      md5: 2dd2a3351f9726be2e1dde6230d6e22b.dir
-      size: 21326848
-      nfiles: 8
-    - path: models/scalers
-      hash: md5
-      md5: b8f29d79f9fc0be7f65ba0ce4f831c74.dir
-      size: 1800
-      nfiles: 2
+      md5: 08e41e9b19f3163cde68ae529a128a96
+      size: 346554
   train:
     cmd: python src/train.py
     deps:
-    - path: data/processed
+    - path: data/processed/data.csv
       hash: md5
-      md5: 2dd2a3351f9726be2e1dde6230d6e22b.dir
-      size: 21326848
-      nfiles: 8
-    - path: params.yaml
-      hash: md5
-      md5: c9a20ea31decda21cffe6f424f4c29af
-      size: 93
+      md5: 08e41e9b19f3163cde68ae529a128a96
+      size: 346554
     - path: src/train.py
       hash: md5
-      md5: 8f9acfd4491c561cf9d6f84812caa7ce
-      size: 2226
+      md5: 79f0ae4d433f2cd240dff83abe90ec0f
+      size: 575
     outs:
     - path: metrics.json
       hash: md5
-      md5: bdde13728c88a57ca50bb7a8e38a1ae3
-      size: 175
-    - path: models/trained
+      md5: c1318c96075ad58400d987fe4c40d7d7
+      size: 36
+    - path: model.pkl
       hash: md5
-      md5: ac9fe57c54bb4d95c5d2ab11d9ca4578.dir
-      size: 527820
-      nfiles: 2
-    - path: version.json
-      hash: md5
-      md5: f6290efe2137e5c68d99ee25f50470cd
-      size: 238
+      md5: b9d6cc2f370832b225a5033f88eb80f7
+      size: 371153
   collect:
     cmd: python src/collect.py
-    deps:
-    - path: params.yaml
-      hash: md5
-      md5: c9a20ea31decda21cffe6f424f4c29af
-      size: 93
-    - path: src/collect.py
-      hash: md5
-      md5: 4a027f1f0ca3b9528092f44243903d46
-      size: 3815
     outs:
-    - path: data/raw
+    - path: data/raw/
       hash: md5
-      md5: 6c83daf836062ce4219f6265e88df486.dir
-      size: 315486
+      md5: 101c852837f6fc2b9c9b4496fa3c9cb1.dir
+      size: 324176
       nfiles: 2

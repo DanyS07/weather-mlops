@@ -1,43 +1,24 @@
 import pandas as pd
-import pickle
+import numpy as np
+import json
+import joblib
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.preprocessing import MinMaxScaler
-import os
+from sklearn.metrics import mean_squared_error
 
-os.makedirs("models/trained", exist_ok=True)
-os.makedirs("models/scalers", exist_ok=True)
-def train(region):
-    # Load data
-    df = pd.read_csv(f"data/raw/{region}.csv")
-    df["time"] = pd.to_datetime(df["time"])
+df = pd.read_csv("data/processed/data.csv")
 
-    # Feature engineering
-    df["hour"] = df["time"].dt.hour
-    df["dayofweek"] = df["time"].dt.dayofweek
+X = df[["hour"]]
+y = df["temperature_2m"]
 
-    df = df.dropna(subset=["temperature_2m"])
-    df = df.drop(columns=["time"])
+model = RandomForestRegressor(n_estimators=100, random_state=42)
+model.fit(X, y)
 
-    # Split
-    X = df.drop(columns=["temperature_2m"])
-    y = df["temperature_2m"]
+preds = model.predict(X)
+rmse = float(np.sqrt(mean_squared_error(y, preds)))
 
-    # Scale
-    scaler = MinMaxScaler()
-    X_scaled = scaler.fit_transform(X)
+joblib.dump(model, "model.pkl")
 
-    # Train model
-    model = RandomForestRegressor(n_estimators=100)
-    model.fit(X_scaled, y)
+with open("metrics.json", "w") as f:
+    json.dump({"rmse": rmse}, f, indent=4)
 
-    # Save model
-    with open(f"models/trained/{region}_model.pkl", "wb") as f:
-        pickle.dump(model, f)
-
-    # Save scaler
-    with open(f"models/scalers/{region}.csv_scaler.pkl", "wb") as f:
-        pickle.dump(scaler, f)
-
-# Train both regions
-train("technopark")
-train("thampanoor")
+print("Training complete")
