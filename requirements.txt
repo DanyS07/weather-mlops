@@ -3,4 +3,4 @@ numpy
 requests
 scikit-learn
 streamlit
-plotly
+joblib

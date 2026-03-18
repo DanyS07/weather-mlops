@@ -1,28 +1,23 @@
 stages:
+  collect:
+    cmd: python src/collect.py
+    outs:
+      - data/raw/
+
   preprocess:
     cmd: python src/preprocess.py
     deps:
+      - data/raw/
       - src/preprocess.py
-      - data/raw
-      - params.yaml
     outs:
-      - data/processed
-      - models/scalers
+      - data/processed/data.csv
 
   train:
     cmd: python src/train.py
     deps:
+      - data/processed/data.csv
       - src/train.py
-      - data/processed
-      - params.yaml
     outs:
-      - models/trained
+      - model.pkl
+    metrics:
       - metrics.json
-      - version.json
-  collect:
-    cmd: python src/collect.py
-    deps:
-      - src/collect.py
-      - params.yaml
-    outs:
-      - data/raw
