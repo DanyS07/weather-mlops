@@ -3,6 +3,5 @@ numpy
 requests
 scikit-learn
 tensorflow
-dvc[gdrive]
 streamlit
 plotly
