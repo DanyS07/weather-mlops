@@ -46,17 +46,17 @@ stages:
     outs:
     - path: metrics.json
       hash: md5
-      md5: 4fe1a7ab1176268b1f413bbefa673788
-      size: 177
+      md5: e597c1761f8a6732905e3cf58772a67a
+      size: 174
     - path: models/trained
       hash: md5
-      md5: 16fadf3b99d845bcfee59e32accad793.dir
+      md5: dfd648ce12184dcea474c65dc99750d6.dir
       size: 526350
       nfiles: 2
     - path: version.json
       hash: md5
-      md5: c219c5e22fae3c77922d348b75ab80af
-      size: 240
+      md5: 91e080c0249ad0eb2b5441312acf9651
+      size: 237
   collect:
     cmd: python src/collect.py
     deps:
