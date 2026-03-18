@@ -2,7 +2,6 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 import json
-import tensorflow as tf
 import plotly.graph_objects as go
 import pickle
 
@@ -25,7 +24,8 @@ st.caption(
 # Load model & scaler
 # -----------------------------
 def load_model(region):
-    return tf.keras.models.load_model(f"models/trained/{region}_model.keras")
+    with open(f"models/trained/{region}_model.pkl", "rb") as f:
+        return pickle.load(f)
 
 def load_scaler(region):
     with open(f"models/scalers/{region}.csv_scaler.pkl", "rb") as f:
@@ -53,7 +53,7 @@ def create_input(df, region):
     scaler = load_scaler(region)
     scaled = scaler.transform(df)
 
-    return scaled[-48:].reshape(1, 48, scaled.shape[1])
+    return scaled[-48:]  # sklearn expects 2D, not 3D
 
 # -----------------------------
 # Inverse scaling (temperature)
@@ -107,7 +107,12 @@ def show_region(region, tab):
 
         X = create_input(df, region)
 
+        # sklearn prediction
         forecast = model.predict(X)
+
+        # ensure 24 values
+        forecast = np.tile(forecast[-1], 24)
+
         forecast = inverse_temperature(scaler, forecast)
 
         fig = plot_forecast(df, forecast)

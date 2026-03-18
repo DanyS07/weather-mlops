@@ -1,86 +1,40 @@
-import numpy as np
-import os
-import yaml
-import json
-from datetime import datetime
-import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import LSTM, Dense, Dropout
+import pandas as pd
+import pickle
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.preprocessing import MinMaxScaler
 
-PROCESSED_PATH = "data/processed"
-MODEL_PATH = "models/trained"
-os.makedirs(MODEL_PATH, exist_ok=True)
+def train(region):
+    # Load data
+    df = pd.read_csv(f"data/raw/{region}.csv")
+    df["time"] = pd.to_datetime(df["time"])
 
-# Load params
-with open("params.yaml", "r") as f:
-    params = yaml.safe_load(f)
+    # Feature engineering
+    df["hour"] = df["time"].dt.hour
+    df["dayofweek"] = df["time"].dt.dayofweek
 
-LOOKBACK = params["data"]["lookback"]
-HORIZON = params["data"]["horizon"]
+    df = df.dropna(subset=["temperature_2m"])
+    df = df.drop(columns=["time"])
 
-def build_model(input_shape):
-    model = Sequential([
-        LSTM(64, input_shape=input_shape),
-        Dropout(0.2),
-        Dense(HORIZON)
-    ])
-    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
-                  loss="mse",
-                  metrics=["mae"])
-    return model
+    # Split
+    X = df.drop(columns=["temperature_2m"])
+    y = df["temperature_2m"]
 
-def train_region(region):
-    X_train = np.load(f"{PROCESSED_PATH}/X_train_{region}.npy")
-    y_train = np.load(f"{PROCESSED_PATH}/y_train_{region}.npy")
-    X_test = np.load(f"{PROCESSED_PATH}/X_test_{region}.npy")
-    y_test = np.load(f"{PROCESSED_PATH}/y_test_{region}.npy")
+    # Scale
+    scaler = MinMaxScaler()
+    X_scaled = scaler.fit_transform(X)
 
-    model = build_model((X_train.shape[1], X_train.shape[2]))
-
-    early_stop = tf.keras.callbacks.EarlyStopping(
-        patience=5, restore_best_weights=True
-    )
-
-    model.fit(
-        X_train, y_train,
-        validation_data=(X_test, y_test),
-        epochs=30,
-        batch_size=32,
-        callbacks=[early_stop],
-        verbose=1
-    )
-
-    # Evaluate
-    loss, mae = model.evaluate(X_test, y_test, verbose=0)
-    rmse = np.sqrt(loss)
+    # Train model
+    model = RandomForestRegressor(n_estimators=100)
+    model.fit(X_scaled, y)
 
     # Save model
-    model.save(f"{MODEL_PATH}/{region}_model.keras")
+    with open(f"models/trained/{region}_model.pkl", "wb") as f:
+        pickle.dump(model, f)
 
-    return mae, rmse
+    # Save scaler
+    with open(f"models/scalers/{region}.csv_scaler.pkl", "wb") as f:
+        pickle.dump(scaler, f)
 
-def main():
-    metrics = {}
-    regions = ["technopark", "thampanoor"]
-
-    for region in regions:
-        mae, rmse = train_region(region)
-        metrics[f"mae_{region}"] = float(mae)
-        metrics[f"rmse_{region}"] = float(rmse)
-
-    # Save metrics
-    with open("metrics.json", "w") as f:
-        json.dump(metrics, f, indent=4)
-
-    # Save version info
-    version_info = {
-        "version": "1.0",
-        "trained_on": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        **metrics
-    }
-
-    with open("version.json", "w") as f:
-        json.dump(version_info, f, indent=4)
-
-if __name__ == "__main__":
-    main()
+# Train both regions
+train("technopark")
+train("thampanoor")
