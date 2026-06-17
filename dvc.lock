@@ -5,7 +5,7 @@ stages:
     deps:
     - path: data/raw/
       hash: md5
-      md5: bd40e8d0d7fc121e0ef26bdde0e9c393.dir
+      md5: 7bd0e17c16aeb5da3c980d1d3f394079.dir
       size: 14824
       nfiles: 2
     - path: src/preprocess.py
@@ -15,14 +15,14 @@ stages:
     outs:
     - path: data/processed/data.csv
       hash: md5
-      md5: e3ec550f241ec764211af78681cab61b
+      md5: c55ccd685e4eb92a6566775d15c8a9fd
       size: 18561
   train:
     cmd: python src/train.py
     deps:
     - path: data/processed/data.csv
       hash: md5
-      md5: e3ec550f241ec764211af78681cab61b
+      md5: c55ccd685e4eb92a6566775d15c8a9fd
       size: 18561
     - path: src/train.py
       hash: md5
@@ -31,17 +31,17 @@ stages:
     outs:
     - path: metrics.json
       hash: md5
-      md5: 7358bc4f9f4d644f20fea40ff3219be0
+      md5: fa2664a49c26296b9520882677a2cc8d
       size: 34
     - path: model.pkl
       hash: md5
-      md5: ac79ad2e2bb9250243c208889f10b183
-      size: 371041
+      md5: 60382d66c1042f1ae0b2020195cce73b
+      size: 371185
   collect:
     cmd: python src/collect.py
     outs:
     - path: data/raw/
       hash: md5
-      md5: bd40e8d0d7fc121e0ef26bdde0e9c393.dir
+      md5: 7bd0e17c16aeb5da3c980d1d3f394079.dir
       size: 14824
       nfiles: 2
